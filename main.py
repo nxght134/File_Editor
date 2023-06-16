@@ -1,4 +1,16 @@
 from tkinter import *
+import csv
+from tkinter import messagebox
+
+
+def all_children(window):
+    _list = window.winfo_children()
+
+    for item in _list:
+        if item.winfo_children():
+            _list.extend(item.winfo_children())
+
+    return _list
 
 
 class Application(Frame):
@@ -22,6 +34,12 @@ class Application(Frame):
         file.write(
             self.write_login.get() + "," + self.write_name.get() + "," + self.password_write.get() + "," + self.write_birthday.get() + "," + self.write_city.get() + "\n")
         file.close()
+        widget_list = all_children(self)
+        for i in widget_list:
+            i.destroy()
+        messagebox.showinfo("Успешно", "Новая запись была добавлена в таблицу")
+        self.create_menu()
+
     def add_record(self):
         self.lbl.destroy()
         self.bttn_add.destroy()
@@ -50,7 +68,24 @@ class Application(Frame):
         self.bttn.grid(row=5, column=0, columnspan=2)
 
     def show_records(self):
-        pass
+        widget_list = all_children(self)
+        for i in widget_list:
+            i.destroy()
+        file = open("database.csv", "r")
+        read = list(csv.reader(file))
+        self.text_wind = Text(self, width=115, height=200, wrap=WORD)
+        self.text_wind.grid(sticky=W)
+        index = 0.0
+        for row in read:
+            new_record = "Логин: " + row[0] + ", имя: " + row[1] + ", дата рождения: " + row[3] + ", город: " + row[
+                4] + "\n"
+            self.text_wind.insert(index, new_record)
+            index += 1.0
+            print(index)
+        file.close()
+
+        self.bttn_return = Button(self, text="Вернуться в меню", command=self.create_menu)
+
 
 
 root = Tk()
